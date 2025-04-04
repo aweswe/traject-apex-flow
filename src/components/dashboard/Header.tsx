@@ -50,12 +50,11 @@ const Header = ({
 }: HeaderProps) => {
   const location = useLocation();
   const { user } = useUser();
-  const [searchQuery, setSearchQuery] = useState("");
-
+  // Remove the duplicate searchQuery declaration and use the one from props instead
+  
   // Handle search input change
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setSearchQuery(value);
     if (onSearchChange) {
       onSearchChange(value);
     }
