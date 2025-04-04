@@ -4,9 +4,9 @@
  * Provides a standardized way to make API requests with authentication and error handling.
  */
 
-type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+export type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
-interface RequestOptions {
+export interface RequestOptions {
   method?: RequestMethod;
   headers?: Record<string, string>;
   body?: any;
