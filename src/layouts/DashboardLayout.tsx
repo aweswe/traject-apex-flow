@@ -1,12 +1,15 @@
 
 import { Outlet, Navigate, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useUser } from "@/context/UserContext";
 import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
 import { useNotifications } from "@/hooks/use-notifications";
 import { useGlobalSearch } from "@/hooks/use-global-search";
 import { SearchResult } from "@/services/api/searchService";
+import ErrorBoundary from "@/components/ui/error-boundary";
+import { LoadingState } from "@/components/ui/loading-state";
+import { toast } from "sonner";
 
 const DashboardLayout = () => {
   const { isAuthenticated, user } = useUser();
@@ -19,7 +22,8 @@ const DashboardLayout = () => {
     notifications = [], 
     unreadCount = 0, 
     markAsRead = async () => {}, 
-    markAllAsRead = async () => {} 
+    markAllAsRead = async () => {}, 
+    error: notificationsError 
   } = useNotifications();
   
   // Global search hook with safe fallbacks
@@ -30,6 +34,15 @@ const DashboardLayout = () => {
     isLoading: isSearchLoading = false, 
     performSearch = async () => {} 
   } = useGlobalSearch();
+
+  // Show toast for notification errors
+  useEffect(() => {
+    if (notificationsError) {
+      toast.error("Notification Error", { 
+        description: notificationsError.message || "Failed to load notifications"
+      });
+    }
+  }, [notificationsError]);
 
   // Close mobile menu when changing routes
   useEffect(() => {
@@ -100,7 +113,11 @@ const DashboardLayout = () => {
         
         {/* Main content area with padding */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-background">
-          <Outlet />
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingState message="Loading page..." />}>
+              <Outlet />
+            </Suspense>
+          </ErrorBoundary>
         </main>
       </div>
     </div>
