@@ -20,7 +20,7 @@ import NotFound from "./pages/NotFound";
 
 // Context
 import { UserProvider } from "./context/UserContext";
-import { ApiProvider } from "./context/ApiContext";
+import { EnhancedApiProvider } from "./context/EnhancedApiContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,7 +41,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <UserProvider>
-        <ApiProvider>
+        <EnhancedApiProvider>
           <TooltipProvider>
             <Toaster />
             <Sonner />
@@ -62,7 +62,7 @@ const App = () => {
               </Routes>
             </BrowserRouter>
           </TooltipProvider>
-        </ApiProvider>
+        </EnhancedApiProvider>
       </UserProvider>
     </QueryClientProvider>
   );

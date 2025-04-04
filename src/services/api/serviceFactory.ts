@@ -1,5 +1,6 @@
 
 import ApiClient from './apiClient';
+import { BACKEND_CONFIG, getApiUrl } from '../../config/backend.config';
 
 // Service provider interface
 export interface ServiceProvider<T> {
@@ -16,7 +17,7 @@ export class ServiceFactory {
     this.apiClient = new ApiClient(baseUrl);
   }
 
-  static getInstance(baseUrl: string = '/api'): ServiceFactory {
+  static getInstance(baseUrl: string = BACKEND_CONFIG.API_URL): ServiceFactory {
     if (!ServiceFactory.instance) {
       ServiceFactory.instance = new ServiceFactory(baseUrl);
     }
@@ -27,6 +28,7 @@ export class ServiceFactory {
   registerService<T>(serviceName: string, provider: ServiceProvider<T>): void {
     if (!this.services.has(serviceName)) {
       this.services.set(serviceName, provider.createService(this.apiClient));
+      console.log(`Service '${serviceName}' registered successfully`);
     }
   }
 
@@ -47,6 +49,11 @@ export class ServiceFactory {
   // Get the API client directly if needed
   getApiClient(): ApiClient {
     return this.apiClient;
+  }
+
+  // Clear all registered services (useful for testing or resetting)
+  destroy(): void {
+    this.services.clear();
   }
 }
 
