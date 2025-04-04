@@ -20,8 +20,16 @@ import NotFound from "./pages/NotFound";
 
 // Context
 import { UserProvider } from "./context/UserContext";
+import { ApiProvider } from "./context/ApiContext";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000, // 1 minute
+      retry: 1,
+    },
+  },
+});
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -33,26 +41,28 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <UserProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/login" element={<Login onLogin={handleLogin} />} />
-              
-              {/* Protected Dashboard Routes */}
-              <Route path="/" element={<DashboardLayout />}>
-                <Route index element={<Dashboard />} />
-                <Route path="leads" element={<LeadManagement />} />
-                <Route path="itinerary" element={<ItineraryBuilder />} />
-                <Route path="proposals" element={<ProposalBuilder />} />
-                <Route path="settings" element={<Settings />} />
-              </Route>
-              
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+        <ApiProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/login" element={<Login onLogin={handleLogin} />} />
+                
+                {/* Protected Dashboard Routes */}
+                <Route path="/" element={<DashboardLayout />}>
+                  <Route index element={<Dashboard />} />
+                  <Route path="leads" element={<LeadManagement />} />
+                  <Route path="itinerary" element={<ItineraryBuilder />} />
+                  <Route path="proposals" element={<ProposalBuilder />} />
+                  <Route path="settings" element={<Settings />} />
+                </Route>
+                
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </ApiProvider>
       </UserProvider>
     </QueryClientProvider>
   );
