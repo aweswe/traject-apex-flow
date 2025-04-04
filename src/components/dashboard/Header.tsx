@@ -10,16 +10,56 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NotificationData } from "@/services/api/notificationService";
+import { SearchResult } from "@/services/api/searchService";
 
 interface HeaderProps {
   isMobileMenuOpen: boolean;
   toggleMobileMenu: () => void;
+  // Add notification related props
+  notificationCount?: number;
+  notifications?: NotificationData[];
+  onMarkRead?: (id: string) => Promise<void>;
+  onMarkAllRead?: () => Promise<void>;
+  // Add search related props
+  isSearchOpen?: boolean;
+  onSearchOpen?: () => void;
+  onSearchClose?: () => void;
+  searchQuery?: string;
+  onSearchChange?: (value: string) => void;
+  searchResults?: SearchResult[];
+  isSearchLoading?: boolean;
+  onSearchResultClick?: (result: SearchResult) => void;
 }
 
-const Header = ({ isMobileMenuOpen, toggleMobileMenu }: HeaderProps) => {
+const Header = ({ 
+  isMobileMenuOpen, 
+  toggleMobileMenu,
+  notificationCount = 0,
+  notifications = [],
+  onMarkRead,
+  onMarkAllRead,
+  isSearchOpen = false,
+  onSearchOpen,
+  onSearchClose,
+  searchQuery = "",
+  onSearchChange,
+  searchResults = [],
+  isSearchLoading = false,
+  onSearchResultClick
+}: HeaderProps) => {
   const location = useLocation();
   const { user } = useUser();
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Handle search input change
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    if (onSearchChange) {
+      onSearchChange(value);
+    }
+  };
 
   // Get the current page title based on route
   const getPageTitle = () => {
@@ -70,17 +110,34 @@ const Header = ({ isMobileMenuOpen, toggleMobileMenu }: HeaderProps) => {
           placeholder="Search..."
           className="pl-8 w-full bg-background"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={handleSearchInputChange}
+          onClick={onSearchOpen}
         />
       </div>
 
       {/* Action buttons */}
-      <Button variant="ghost" size="icon" aria-label="Notifications">
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        aria-label="Notifications"
+        onClick={onMarkAllRead}
+      >
         <Bell className="h-5 w-5" />
+        {notificationCount > 0 && (
+          <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
+            {notificationCount > 9 ? '9+' : notificationCount}
+          </span>
+        )}
       </Button>
 
       {/* Quick search for mobile */}
-      <Button variant="ghost" size="icon" className="md:hidden" aria-label="Search">
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        className="md:hidden" 
+        aria-label="Search"
+        onClick={onSearchOpen}
+      >
         <Search className="h-5 w-5" />
       </Button>
     </header>
