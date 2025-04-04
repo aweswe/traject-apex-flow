@@ -16,19 +16,19 @@ const DashboardLayout = () => {
   
   // Notifications hook
   const { 
-    notifications, 
-    unreadCount, 
-    markAsRead, 
-    markAllAsRead 
+    notifications = [], 
+    unreadCount = 0, 
+    markAsRead = async () => {}, 
+    markAllAsRead = async () => {} 
   } = useNotifications();
   
   // Global search hook
   const { 
-    query, 
-    setQuery, 
-    results, 
-    isLoading: isSearchLoading, 
-    performSearch 
+    query = '', 
+    setQuery = () => {}, 
+    results = [], 
+    isLoading: isSearchLoading = false, 
+    performSearch = async () => {} 
   } = useGlobalSearch();
 
   // Close mobile menu when changing routes

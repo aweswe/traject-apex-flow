@@ -1,11 +1,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { useApi } from '@/context/ApiContext';
+import { useEnhancedApi } from '@/context/EnhancedApiContext';
 import { NotificationData } from '@/services/api/notificationService';
 import { toast } from "sonner";
 
 export function useNotifications() {
-  const { notificationService } = useApi();
+  const { notificationService } = useEnhancedApi();
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -13,6 +13,11 @@ export function useNotifications() {
   
   // Load notifications
   const loadNotifications = useCallback(async () => {
+    if (!notificationService) {
+      console.warn('Notification service not available yet');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     
@@ -34,6 +39,8 @@ export function useNotifications() {
   
   // Mark a notification as read
   const markAsRead = async (id: string) => {
+    if (!notificationService) return;
+    
     try {
       const response = await notificationService.markAsRead(id);
       if (response.data) {
@@ -49,6 +56,8 @@ export function useNotifications() {
   
   // Mark all notifications as read
   const markAllAsRead = async () => {
+    if (!notificationService) return;
+    
     try {
       await notificationService.markAllAsRead();
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
@@ -60,6 +69,8 @@ export function useNotifications() {
   
   // Delete a notification
   const deleteNotification = async (id: string) => {
+    if (!notificationService) return;
+    
     try {
       await notificationService.deleteNotification(id);
       const notificationToRemove = notifications.find(n => n.id === id);
@@ -76,6 +87,12 @@ export function useNotifications() {
   
   // Subscribe to real-time updates
   useEffect(() => {
+    // Skip if service is not available
+    if (!notificationService) {
+      console.warn('Notification service not available yet, skipping real-time subscription');
+      return;
+    }
+    
     // Initial load
     loadNotifications();
     

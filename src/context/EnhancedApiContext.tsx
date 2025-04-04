@@ -43,7 +43,7 @@ export const EnhancedApiProvider: React.FC<{ children: React.ReactNode }> = ({ c
   
   // Initialize the service factory
   useEffect(() => {
-    const initializeServices = () => {
+    const initializeServices = async () => {
       try {
         // Initialize the service factory
         const serviceFactory = EnhancedServiceFactory.getInstance();
