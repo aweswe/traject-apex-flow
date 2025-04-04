@@ -14,7 +14,7 @@ const DashboardLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   
-  // Notifications hook
+  // Notifications hook with safe fallbacks
   const { 
     notifications = [], 
     unreadCount = 0, 
@@ -22,7 +22,7 @@ const DashboardLayout = () => {
     markAllAsRead = async () => {} 
   } = useNotifications();
   
-  // Global search hook
+  // Global search hook with safe fallbacks
   const { 
     query = '', 
     setQuery = () => {}, 

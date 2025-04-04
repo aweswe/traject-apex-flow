@@ -87,47 +87,63 @@ export function useNotifications() {
   
   // Subscribe to real-time updates
   useEffect(() => {
-    // Skip if service is not available
-    if (!notificationService) {
-      console.warn('Notification service not available yet, skipping real-time subscription');
-      return;
-    }
+    // Create a safe unsubscribe function for use in cleanup
+    let unsubscribe = () => {};
     
-    // Initial load
-    loadNotifications();
-    
-    // Subscribe to real-time notifications
-    const unsubscribe = notificationService.subscribeToRealTimeUpdates((newNotification) => {
-      // Add the new notification to the list
-      setNotifications(prev => [newNotification, ...prev]);
-      
-      // Update unread count
-      if (!newNotification.read) {
-        setUnreadCount(prev => prev + 1);
+    const setupSubscription = () => {
+      // Skip if service is not available
+      if (!notificationService) {
+        console.warn('Notification service not available yet, skipping real-time subscription');
+        return;
       }
       
-      // Show a toast notification for the new notification
-      toast(newNotification.title, {
-        description: newNotification.message,
-        action: {
-          label: "View",
-          onClick: () => {
-            // Navigate to the relevant page if there's an action URL
-            if (newNotification.actionUrl) {
-              window.location.href = newNotification.actionUrl;
-            }
-            // Mark as read
-            markAsRead(newNotification.id);
-          },
-        },
-      });
-    });
+      try {
+        // Initial load
+        loadNotifications();
+        
+        // Subscribe to real-time notifications
+        unsubscribe = notificationService.subscribeToRealTimeUpdates((newNotification) => {
+          // Add the new notification to the list
+          setNotifications(prev => [newNotification, ...prev]);
+          
+          // Update unread count
+          if (!newNotification.read) {
+            setUnreadCount(prev => prev + 1);
+          }
+          
+          // Show a toast notification for the new notification
+          toast(newNotification.title, {
+            description: newNotification.message,
+            action: {
+              label: "View",
+              onClick: () => {
+                // Navigate to the relevant page if there's an action URL
+                if (newNotification.actionUrl) {
+                  window.location.href = newNotification.actionUrl;
+                }
+                // Mark as read
+                markAsRead(newNotification.id);
+              },
+            },
+          });
+        });
+      } catch (error) {
+        console.error('Failed to setup notification subscription:', error);
+      }
+    };
+    
+    // Setup subscription
+    setupSubscription();
     
     // Cleanup subscription on unmount
     return () => {
-      unsubscribe();
+      try {
+        unsubscribe();
+      } catch (error) {
+        console.error('Error unsubscribing from notifications:', error);
+      }
     };
-  }, [notificationService, loadNotifications]);
+  }, [notificationService, loadNotifications, markAsRead]);
   
   return {
     notifications,

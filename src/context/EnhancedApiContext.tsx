@@ -45,6 +45,8 @@ export const EnhancedApiProvider: React.FC<{ children: React.ReactNode }> = ({ c
   useEffect(() => {
     const initializeServices = async () => {
       try {
+        console.log('Initializing enhanced API services...');
+        
         // Initialize the service factory
         const serviceFactory = EnhancedServiceFactory.getInstance();
         
@@ -86,19 +88,28 @@ export const EnhancedApiProvider: React.FC<{ children: React.ReactNode }> = ({ c
     
     // Cleanup function
     return () => {
-      const serviceFactory = EnhancedServiceFactory.getInstance();
-      serviceFactory.destroy();
+      try {
+        const serviceFactory = EnhancedServiceFactory.getInstance();
+        serviceFactory.destroy();
+        console.log('Enhanced API services cleaned up');
+      } catch (error) {
+        console.error('Error cleaning up enhanced API services:', error);
+      }
     };
   }, []);
   
   // Update auth token when user changes
   useEffect(() => {
     if (user && isInitialized) {
-      const serviceFactory = EnhancedServiceFactory.getInstance();
-      // In a real app, this would be the JWT token from your auth system
-      const mockAuthToken = "mock-jwt-token-for-user-" + user.id;
-      serviceFactory.setAuthToken(mockAuthToken);
-      console.log('Enhanced API: Auth token updated for user:', user.id);
+      try {
+        const serviceFactory = EnhancedServiceFactory.getInstance();
+        // In a real app, this would be the JWT token from your auth system
+        const mockAuthToken = "mock-jwt-token-for-user-" + user.id;
+        serviceFactory.setAuthToken(mockAuthToken);
+        console.log('Enhanced API: Auth token updated for user:', user.id);
+      } catch (error) {
+        console.error('Failed to update auth token:', error);
+      }
     }
   }, [user, isInitialized]);
   
